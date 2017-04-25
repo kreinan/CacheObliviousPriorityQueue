@@ -47,7 +47,7 @@ void Level::push(int *elements, int numElements)
     std::sort(elements, elements + numElements);
     for(int i = 0; i < numElements; i++)
     {
-        std::cout << "elements[" << i << "]: " << elements[i] << std::endl;
+        std::cout << "elements[" << i << "]: " << elements[i] << " at " << &elements[i] << std::endl;
     }
     DownBuffer *buff = downBufferHead;
     while(numElements > 0 && buff){
@@ -65,7 +65,6 @@ void Level::push(int *elements, int numElements)
             int pivot = buff->getPivot();
             for(int i = 0; i < numElements; i++)
             {
-                std::cout << "pivot: " << pivot << std::endl;
                 if(elements[i] > pivot)
                 {
                     break;
