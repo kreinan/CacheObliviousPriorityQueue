@@ -36,6 +36,7 @@ private:
     Buffer *upBuffer;
     DownBuffer **downBuffers;
     void makeDownBuffers(DownBuffer *loc);
+    DownBuffer *freeBuffer();
 };
 
 #endif /* Level_hpp */

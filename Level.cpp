@@ -74,22 +74,7 @@ void Level::push(int *elements, int numElements)
             }
             while(buff->getCapacity() - buff->getNumElements() < elementsToInsert)
             {
-                DownBuffer *slot = nullptr;
-                for(int j = 0; j <= ceil(pow(size,1.0/3.0)); j++){
-                    if(downBuffers[j]->isFree())
-                    {
-                        slot = downBuffers[j];
-                        break;
-                    }
-                }
-                if(!slot)
-                {
-                    DownBuffer *last = getLast();
-                    insertUp(last->getStart(), last->getNumElements());
-                    last->getPrev()->setNext(nullptr);
-                    last->setFree();
-                    slot = last;
-                }
+                DownBuffer *slot = freeBuffer();
                 buff->split(slot);
                 elementsToInsert = 0;
                 int pivot = buff->getPivot();
@@ -146,24 +131,24 @@ void Level::pull(int *elements, int numElements)
             downBufferHead->getNext()->setPrev(nullptr);
             downBufferHead = downBufferHead->getNext();
             temp->setFree();
+            std::cout << "remaining: " << remaining << " elements in down buffer head: " << downBufferHead->getNumElements() << std::endl;
             std::sort(downBufferHead->getStart(), downBufferHead->getLastElement());
             std::copy(downBufferHead->getStart(), downBufferHead->getStart() + remaining, elements + copied * sizeof(int));
             downBufferHead->setNumElements(downBufferHead->getNumElements() - remaining);
             int temp2[downBufferHead->getNumElements()];
             std::copy(downBufferHead->getStart() + remaining * sizeof(int), downBufferHead->getStart() + downBufferHead->getNumElements() - remaining, temp2);
             std::copy(temp2, temp2 + remaining, downBufferHead->getStart());
-            //downBufferHead->setLast(downBufferHead->getStart() + downBufferHead->getNumElements() * sizeof(int));
         }
         else{
             int sortSize = (int)floor(size) + upBuffer->getNumElements();
             int pulledElements[sortSize];
             nextLevel->pull(pulledElements, floor(size));
             std::copy(upBuffer->getStart(), upBuffer->getStart() + upBuffer->getNumElements(), &pulledElements[(int)floor(size)]);
-            std::sort(&pulledElements[0], &pulledElements[sortSize]);
+            std::sort(pulledElements, &pulledElements[sortSize]);
             std::copy(&pulledElements[(int)floor(size)], pulledElements + sortSize, upBuffer->getStart());
-            std::copy(pulledElements, pulledElements + remaining, elements + copied * sizeof(int));
-            int elementsToDistribute = sortSize - remaining - upBuffer->getNumElements();
-            int *distElements = &pulledElements[remaining];
+            std::copy(pulledElements, pulledElements + numElements, elements + copied * sizeof(int));
+            int elementsToDistribute = sortSize - numElements - upBuffer->getNumElements();
+            int *distElements = &pulledElements[numElements];
             DownBuffer *buff = downBufferHead;
             int maxSize = floor(pow(size, 2.0/3.0));
             while(elementsToDistribute > 0)
@@ -172,7 +157,7 @@ void Level::pull(int *elements, int numElements)
                 if(elementsToDistribute > maxSize)
                 {
                     els = maxSize;
-                    DownBuffer *newBuff = new DownBuffer(2 * floor(pow(size,2.0/3.0)));
+                    DownBuffer *newBuff = freeBuffer();
                     buff->setNext(newBuff);
                     newBuff->setPrev(buff);
                 }
@@ -184,6 +169,7 @@ void Level::pull(int *elements, int numElements)
                 buff->setNumElements(els);
                 elementsToDistribute -= els;
                 distElements += els * sizeof(int);
+                buff = buff->getNext();
             }
         }
     }
@@ -223,4 +209,25 @@ void Level::makeDownBuffers(DownBuffer *loc)
         downBuffers[i] = newBuff;
         loc += newBuff->getCapacity() * sizeof(int) + sizeof(DownBuffer);
     }
+}
+
+DownBuffer* Level::freeBuffer()
+{
+    DownBuffer *slot = nullptr;
+    for(int j = 0; j <= ceil(pow(size,1.0/3.0)); j++){
+        if(downBuffers[j]->isFree())
+        {
+            slot = downBuffers[j];
+            break;
+        }
+    }
+    if(!slot)
+    {
+        DownBuffer *last = getLast();
+        insertUp(last->getStart(), last->getNumElements());
+        last->getPrev()->setNext(nullptr);
+        last->setFree();
+        slot = last;
+    }
+    return slot;
 }
