@@ -135,7 +135,7 @@ void Level::pull(int *elements, int numElements)
             std::copy(downBufferHead->getStart(), downBufferHead->getStart() + remaining, elements + copied * sizeof(int));
             downBufferHead->setNumElements(downBufferHead->getNumElements() - remaining);
             int temp2[downBufferHead->getNumElements()];
-            std::copy(downBufferHead->getStart() + remaining * sizeof(int), downBufferHead->getStart() + downBufferHead->getNumElements() - remaining, temp2);
+            std::copy(downBufferHead->getStart() + remaining, downBufferHead->getStart() + downBufferHead->getNumElements() - remaining, temp2);
             std::copy(temp2, temp2 + remaining, downBufferHead->getStart());
         }
         else{
