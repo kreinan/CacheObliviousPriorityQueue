@@ -4,7 +4,7 @@
 Buffer::Buffer(int elements)
 {
     capacity = elements;
-    start = (int *)this + sizeof(Buffer);
+    start = new (this + sizeof(Buffer)) int[elements];
     //lastElement = start;
     numElements = 0;
 }
@@ -61,7 +61,7 @@ IDBuffer::IDBuffer(int elements) : Buffer(elements)
 DownBuffer::DownBuffer(int elements) : Buffer(elements)
 {
     //prev = nullptr;
-    start = (int *)this + sizeof(DownBuffer);
+    start = new (this + sizeof(DownBuffer)) int[elements];
     free = true;
     next = nullptr;
     prev = nullptr;
@@ -111,8 +111,6 @@ void DownBuffer::setPivot(int *newPivot)
 
 int DownBuffer::getPivot()
 {
-    std::cout << "start at " << start << std::endl;
-    std::cout << "pivot: " << *pivot << " at " << pivot << std::endl;
     return *pivot;
 }
 
