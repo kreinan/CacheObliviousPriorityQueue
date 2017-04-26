@@ -45,10 +45,6 @@ int Level::getMemSize()
 void Level::push(int *elements, int numElements)
 {
     std::sort(elements, elements + numElements);
-    for(int i = 0; i < numElements; i++)
-    {
-        std::cout << "elements[" << i << "]: " << elements[i] << " at " << &elements[i] << std::endl;
-    }
     DownBuffer *buff = downBufferHead;
     while(numElements > 0 && buff){
         if(buff->isFree())
@@ -56,7 +52,7 @@ void Level::push(int *elements, int numElements)
             buff->fill();
             buff->setNumElements(numElements);
             std::copy(elements, elements + numElements, buff->getStart());
-            buff->setPivot(buff->getLastElement() - sizeof(int));
+            buff->setPivot(buff->getLastElement() - 1);
             numElements = 0;
         }
         else
@@ -88,7 +84,7 @@ void Level::push(int *elements, int numElements)
             }
             buff->insert(elements, elementsToInsert);
             buff = buff->getNext();
-            elements += elementsToInsert * sizeof(int);
+            elements += elementsToInsert;
             numElements -= elementsToInsert;
         }
         
@@ -132,7 +128,7 @@ void Level::pull(int *elements, int numElements)
             temp->setFree();
             std::cout << "remaining: " << remaining << " elements in down buffer head: " << downBufferHead->getNumElements() << std::endl;
             std::sort(downBufferHead->getStart(), downBufferHead->getLastElement());
-            std::copy(downBufferHead->getStart(), downBufferHead->getStart() + remaining, elements + copied * sizeof(int));
+            std::copy(downBufferHead->getStart(), downBufferHead->getStart() + remaining, elements + copied);
             downBufferHead->setNumElements(downBufferHead->getNumElements() - remaining);
             int temp2[downBufferHead->getNumElements()];
             std::copy(downBufferHead->getStart() + remaining, downBufferHead->getStart() + downBufferHead->getNumElements() - remaining, temp2);
@@ -145,7 +141,7 @@ void Level::pull(int *elements, int numElements)
             std::copy(upBuffer->getStart(), upBuffer->getStart() + upBuffer->getNumElements(), &pulledElements[(int)floor(size)]);
             std::sort(pulledElements, &pulledElements[sortSize]);
             std::copy(&pulledElements[(int)floor(size)], pulledElements + sortSize, upBuffer->getStart());
-            std::copy(pulledElements, pulledElements + numElements, elements + copied * sizeof(int));
+            std::copy(pulledElements, pulledElements + numElements, elements + copied);
             int elementsToDistribute = sortSize - numElements - upBuffer->getNumElements();
             int *distElements = &pulledElements[numElements];
             DownBuffer *buff = downBufferHead;
@@ -167,7 +163,7 @@ void Level::pull(int *elements, int numElements)
                 //buff->setLast(buff->getStart() + els * sizeof(int));
                 buff->setNumElements(els);
                 elementsToDistribute -= els;
-                distElements += els * sizeof(int);
+                distElements += els;
                 buff = buff->getNext();
             }
         }
@@ -194,7 +190,7 @@ void Level::insertUp(int *elements, int numElements)
         nextLevel->push(upBuffer->getStart(), upBuffer->getNumElements());
         //upBuffer->setLast(upBuffer->getStart());
         upBuffer->setNumElements(0);
-        upBuffer->insert(elements + elementsUp * sizeof(int), remaining);
+        upBuffer->insert(elements + elementsUp, remaining);
     }
     
 }

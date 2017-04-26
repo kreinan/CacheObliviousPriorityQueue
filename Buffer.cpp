@@ -45,7 +45,7 @@ void Buffer::insert(int element)
 
 int* Buffer::getLastElement()
 {
-    return start + numElements * sizeof(int);
+    return start + numElements;
 }
 
 void Buffer::empty()
@@ -111,6 +111,7 @@ void DownBuffer::setPivot(int *newPivot)
 
 int DownBuffer::getPivot()
 {
+    std::cout << "start at " << start << std::endl;
     std::cout << "pivot: " << *pivot << " at " << pivot << std::endl;
     return *pivot;
 }
@@ -120,13 +121,13 @@ void DownBuffer::split(DownBuffer *newBuff)
     std::sort(start, getLastElement());
     int thisElements = (int)(numElements/2);
     int otherElements = numElements - thisElements;
-    int *mid = start + thisElements * sizeof(int);
+    int *mid = start + thisElements;
     std::copy(mid, mid + otherElements, newBuff->getStart());
     newBuff->fill();
     newBuff->setNumElements(otherElements);
-    newBuff->setPivot(newBuff->getStart() + (otherElements - 1) * sizeof(int));
+    newBuff->setPivot(newBuff->getStart() + otherElements - 1);
     newBuff->setNext(this->getNext());
     this->setNext(newBuff);
     newBuff->setPrev(this);
-    pivot = mid - sizeof(int);
+    pivot = mid - 1;
 }
