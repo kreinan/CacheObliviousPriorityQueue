@@ -7,6 +7,7 @@ PQueue::PQueue(int N)
     c = computec(N0);
     //std::cout << size << std::endl;
     ptr = malloc(10000000);
+    std::cout << ptr << std::endl;
     head = new ((Level *)ptr)Level(c);
     createLevels(head, addBytes<Level, Level>((Level *)ptr, head->getMemSize()));
     insertionBuffer = new IDBuffer(floor(pow(c, 2.0/3.0)));

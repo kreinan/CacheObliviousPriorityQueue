@@ -27,7 +27,7 @@ public:
     DownBuffer *getLast();
     void insertUp(int *elements, int numElements);
     
-private:
+//private:
     DownBuffer *downBufferHead;
     Level *nextLevel;
     Level *prevLevel;
@@ -37,6 +37,7 @@ private:
     DownBuffer **downBuffers;
     void makeDownBuffers(DownBuffer *loc);
     DownBuffer *freeBuffer();
+    int numDown;
 };
 
 #endif /* Level_hpp */

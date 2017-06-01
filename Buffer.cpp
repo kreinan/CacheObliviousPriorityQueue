@@ -8,6 +8,13 @@ Buffer::Buffer(int elements)
     numElements = 0;
 }
 
+Buffer::Buffer()
+{
+    capacity = 0;
+    start = nullptr;
+    numElements = 0;
+}
+
 int Buffer::getCapacity()
 {
     return capacity;
@@ -33,9 +40,8 @@ int Buffer::getNumElements()
 
 void Buffer::insert(int* elements, int nElements)
 {
-    if(getCapacity() - getNumElements() >= nElements)
+    if(capacity - numElements >= nElements)
     {
-        std::cout << getLastElement() << std::endl;
         std::copy(elements, elements + nElements, getLastElement());
         numElements += nElements;
         assert(numElements <= capacity);
@@ -62,18 +68,26 @@ void Buffer::empty()
     numElements = 0;
 }
 
-IDBuffer::IDBuffer(int elements) : Buffer(elements)
+void* Buffer::getEnd()
 {
+    return (void *)(start + capacity);
+}
+
+IDBuffer::IDBuffer(int elements) : Buffer()
+{
+    capacity = elements;
     start = new int[elements];
 }
 
-DownBuffer::DownBuffer(int elements) : Buffer(elements)
+DownBuffer::DownBuffer(int elements) : Buffer()
 {
     //prev = nullptr;
+    capacity = elements;
     start = new (this + 1) int[elements];
     free = true;
     next = nullptr;
     prev = nullptr;
+    pivot = nullptr;
 }
 
 DownBuffer* DownBuffer::getNext()
@@ -106,6 +120,7 @@ void DownBuffer::setFree()
     free = true;
     prev = nullptr;
     next = nullptr;
+    pivot = nullptr;
 }
 
 void DownBuffer::fill()
@@ -131,6 +146,7 @@ void DownBuffer::split(DownBuffer *newBuff)
     int *mid = start + thisElements;
     std::copy(mid, mid + otherElements, newBuff->getStart());
     newBuff->fill();
+    this->setNumElements(thisElements);
     newBuff->setNumElements(otherElements);
     newBuff->setPivot(newBuff->getStart() + otherElements - 1);
     newBuff->setNext(this->getNext());

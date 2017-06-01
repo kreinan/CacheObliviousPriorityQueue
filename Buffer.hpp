@@ -24,11 +24,12 @@ public:
     void insert(int element);
     int *getLastElement();
     void empty();
+    void *getEnd();
+
 protected:
-    int *start;
+    Buffer();
     int numElements;
-    
-private:
+    int *start;
     int capacity;
     
 };

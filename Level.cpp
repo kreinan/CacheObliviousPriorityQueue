@@ -6,10 +6,13 @@ Level::Level(double s)
 {
     size = s;
     memSize = (ceil(pow(s,1.0/3.0)) + 1) * (2 * floor(pow(s,2.0/3.0)) * sizeof(int) + sizeof(DownBuffer)) + floor(s) * sizeof(int) + sizeof(Buffer) + sizeof(Level);
-    downBuffers = new (this + 1) DownBuffer*[(int)ceil(pow(size,1.0/3.0))];
+    numDown = (int)ceil(pow(size,1.0/3.0));
+    downBuffers = new (this + 1) DownBuffer*[numDown];
     upBuffer = new (addBytes<Buffer, DownBuffer*>(downBuffers, sizeof(downBuffers))) Buffer(floor(size));
     makeDownBuffers(addBytes<DownBuffer,Buffer>(upBuffer,upBuffer->getCapacity() * sizeof(int) + sizeof(Buffer)));
     downBufferHead = downBuffers[0];
+    nextLevel = nullptr;
+    prevLevel = nullptr;
 }
 
 double Level::getSize()
@@ -198,18 +201,18 @@ void Level::insertUp(int *elements, int numElements)
 void Level::makeDownBuffers(DownBuffer *loc)
 {
     int downSize = 2 * floor(pow(size,2.0/3.0));
-    for(int i = 0; i <= ceil(pow(size,1.0/3.0)); i++)
+    for(int i = 0; i < numDown; i++)
     {
         DownBuffer *newBuff = new (loc) DownBuffer(downSize);
         downBuffers[i] = newBuff;
-        loc = addBytes<DownBuffer,DownBuffer>(loc,newBuff->getCapacity()*sizeof(int) + sizeof(DownBuffer));
+        loc = (DownBuffer *)newBuff->getEnd();
     }
 }
 
 DownBuffer* Level::freeBuffer()
 {
     DownBuffer *slot = nullptr;
-    for(int j = 0; j <= ceil(pow(size,1.0/3.0)); j++){
+    for(int j = 0; j < numDown; j++){
         if(downBuffers[j]->isFree())
         {
             slot = downBuffers[j];
