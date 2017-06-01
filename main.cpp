@@ -4,7 +4,7 @@
 #include "PQueue.hpp"
 
 int main(int argc, const char * argv[]) {
-    PQueue *p = new PQueue(20);
+    /*PQueue *p = new PQueue(20);
     int r;
     srand (time(NULL));
     for(int i = 0; i < 20; i++)
@@ -17,7 +17,10 @@ int main(int argc, const char * argv[]) {
     {
         int smallest = p->deleteMin();
         std::cout << "Smallest int is " << smallest << std::endl;
-    }
+    }*/
+    Buffer *b = new Buffer(4);
+    int inArr[2] = {1,2};
+    b->insert(inArr, 2);
     return 0;
 }
 

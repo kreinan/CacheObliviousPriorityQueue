@@ -6,9 +6,9 @@ Level::Level(double s)
 {
     size = s;
     memSize = (ceil(pow(s,1.0/3.0)) + 1) * (2 * floor(pow(s,2.0/3.0)) * sizeof(int) + sizeof(DownBuffer)) + floor(s) * sizeof(int) + sizeof(Buffer) + sizeof(Level);
-    upBuffer = new (this + sizeof(Level)) Buffer(floor(size));
-    downBuffers = new DownBuffer*[(int)ceil(pow(size,1.0/3.0))];
-    makeDownBuffers((DownBuffer *)(upBuffer + upBuffer->getCapacity() * sizeof(int) + sizeof(Buffer)));
+    downBuffers = new (this + 1) DownBuffer*[(int)ceil(pow(size,1.0/3.0))];
+    upBuffer = new (addBytes<Buffer, DownBuffer*>(downBuffers, sizeof(downBuffers))) Buffer(floor(size));
+    makeDownBuffers(addBytes<DownBuffer,Buffer>(upBuffer,upBuffer->getCapacity() * sizeof(int) + sizeof(Buffer)));
     downBufferHead = downBuffers[0];
 }
 
@@ -202,7 +202,7 @@ void Level::makeDownBuffers(DownBuffer *loc)
     {
         DownBuffer *newBuff = new (loc) DownBuffer(downSize);
         downBuffers[i] = newBuff;
-        loc += newBuff->getCapacity() * sizeof(int) + sizeof(DownBuffer);
+        loc = addBytes<DownBuffer,DownBuffer>(loc,newBuff->getCapacity()*sizeof(int) + sizeof(DownBuffer));
     }
 }
 

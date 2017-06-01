@@ -6,9 +6,9 @@ PQueue::PQueue(int N)
     N0 = 2 * N;
     c = computec(N0);
     //std::cout << size << std::endl;
-    ptr = new int[size];
-    head = new (ptr)Level(c);
-    createLevels(head, ptr + head->getMemSize() * sizeof(int));
+    ptr = malloc(10000000);
+    head = new ((Level *)ptr)Level(c);
+    createLevels(head, addBytes<Level, Level>((Level *)ptr, head->getMemSize()));
     insertionBuffer = new IDBuffer(floor(pow(c, 2.0/3.0)));
     deletionBuffer = new IDBuffer(floor(pow(c, 2.0/3.0)));
 }
@@ -103,13 +103,13 @@ double PQueue::computec(double n0)
     return c;
 }
 
-void PQueue::createLevels(Level *l, int *loc){
+void PQueue::createLevels(Level *l, Level *loc){
     if(l->getSize() < N0)
     {
         Level *n = new (loc) Level(pow(l->getSize(),3.0/2.0));
         l->setNext(n);
         n->setPrev(l);
-        createLevels(n, loc + n->getMemSize());
+        createLevels(n, addBytes<Level, Level>((Level *)loc, head->getMemSize()));
     }
 }
 

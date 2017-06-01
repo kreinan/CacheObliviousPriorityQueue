@@ -29,11 +29,11 @@ private:
     static const int threshold = 3;
     int N0;
     double c;
-    int *ptr;
+    void *ptr;
     IDBuffer *insertionBuffer;
     IDBuffer *deletionBuffer;
     double computec(double n0);
-    void createLevels(Level *l, int *loc);
+    void createLevels(Level *l, Level *loc);
 };
 
 #endif /* PQueue_hpp */

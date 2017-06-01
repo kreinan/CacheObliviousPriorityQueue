@@ -4,8 +4,7 @@
 Buffer::Buffer(int elements)
 {
     capacity = elements;
-    start = new (this + sizeof(Buffer)) int[elements];
-    //lastElement = start;
+    start = new (this + 1) int[elements];
     numElements = 0;
 }
 
@@ -23,17 +22,27 @@ int* Buffer::getStart()
 void Buffer::setNumElements(int elements)
 {
     numElements = elements;
+    assert(numElements <= capacity);
 }
 
 int Buffer::getNumElements()
 {
+    assert(numElements <= capacity);
     return numElements;
 }
 
 void Buffer::insert(int* elements, int nElements)
 {
-    std::copy(elements, elements + nElements, getLastElement());
-    numElements += nElements;
+    if(getCapacity() - getNumElements() >= nElements)
+    {
+        std::cout << getLastElement() << std::endl;
+        std::copy(elements, elements + nElements, getLastElement());
+        numElements += nElements;
+        assert(numElements <= capacity);
+    }
+    else{
+        std::cout << "not enough space" << std::endl;
+    }
 }
 
 void Buffer::insert(int element)
@@ -61,7 +70,7 @@ IDBuffer::IDBuffer(int elements) : Buffer(elements)
 DownBuffer::DownBuffer(int elements) : Buffer(elements)
 {
     //prev = nullptr;
-    start = new (this + sizeof(DownBuffer)) int[elements];
+    start = new (this + 1) int[elements];
     free = true;
     next = nullptr;
     prev = nullptr;

@@ -10,6 +10,7 @@
 #define Buffer_hpp
 
 #include <stdio.h>
+#include <cassert>
 
 class Buffer
 {
@@ -60,5 +61,12 @@ private:
     bool free;
     int *pivot;
 };
+
+template <class T, class T2>
+T *addBytes(T2 *ptr, int offset){
+    unsigned char* bytePtr = reinterpret_cast<unsigned char*>(ptr);
+    bytePtr += offset;
+    return reinterpret_cast<T*>(bytePtr);
+}
 
 #endif /* Buffer_hpp */
