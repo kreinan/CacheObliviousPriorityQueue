@@ -12,62 +12,49 @@
 #include <stdio.h>
 #include <cassert>
 
+template <typename T>
 class Buffer
 {
 public:
-    Buffer(int elements);
+    Buffer(int *_start, int elements);
     int getCapacity();
     int* getStart();
     void setNumElements(int elements);
     int getNumElements();
     void insert(int* elements, int nElements);
     void insert(int element);
-    int *getLastElement();
+    T *getLastElement();
     void empty();
     void *getEnd();
+    Buffer* getNext();
+    Buffer* getPrev();
+    void setNext(Buffer *n);
+    void setPrev(Buffer *p);
+    bool isFree();
+    void setFree();
+    void fill();
+    void setPivot(int *newPivot);
+    int getPivot();
+    void split(Buffer *newBuff);
 
 protected:
     Buffer();
     int numElements;
     int *start;
     int capacity;
-    
+    Buffer *next;
+    Buffer *prev;
+    int *pivot;
+    bool free;    
 };
 
-class IDBuffer : public Buffer
+template <typename T>
+class IDBuffer : public Buffer<T>
 {
 public:
     IDBuffer(int elements);
+    void setNext(Buffer<T>* n) = delete;
+    void setPrev(Buffer<T>* p) = delete;
 };
-
-class DownBuffer : public Buffer
-{
-public:
-    DownBuffer(int elements);
-    DownBuffer* getNext();
-    DownBuffer* getPrev();
-    void setNext(DownBuffer *n);
-    void setPrev(DownBuffer *p);
-    bool isFree();
-    void setFree();
-    void fill();
-    void setPivot(int *newPivot);
-    int getPivot();
-    void split(DownBuffer *newBuff);
-
-private:
-    
-    DownBuffer *next;
-    DownBuffer *prev;
-    bool free;
-    int *pivot;
-};
-
-template <class T, class T2>
-T *addBytes(T2 *ptr, int offset){
-    unsigned char* bytePtr = reinterpret_cast<unsigned char*>(ptr);
-    bytePtr += offset;
-    return reinterpret_cast<T*>(bytePtr);
-}
 
 #endif /* Buffer_hpp */

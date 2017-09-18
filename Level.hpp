@@ -12,31 +12,43 @@
 #include <stdio.h>
 #include "Buffer.hpp"
 
+template <typename T>
 class Level
 {
 public:
-    Level(double s);
-    double getSize();
-    Level* getNext();
-    Level* getPrev();
-    void setNext(Level *l);
-    void setPrev(Level *l);
+    Level(double s, Buffer<T> *buffer, T *item)
+    {
+        size = s;
+        numDown = (int)ceil(pow(size,1.0/3.0)) + 1;
+        //downBuffers = new (this + 1) DownBuffer*[numDown];
+        upBuffer = buffer;
+        //makeDownBuffers(addBytes<DownBuffer,Buffer>(upBuffer,upBuffer->getCapacity() * sizeof(int) + sizeof(Buffer)));
+        downBufferHead = buffer + 1;
+        //nextLevel = nullptr;
+        //prevLevel = nullptr;
+    }
+
+    double getSize() { return size; }
+    int getNumDown() { return numDown; }
+    //Level* getNext();
+    //Level* getPrev();
+    //void setNext(Level *l);
+    //void setPrev(Level *l);
     int getMemSize();
     void push(int *elements, int numElements);
     void pull(int *elements, int numElements);
-    DownBuffer *getLast();
+    Buffer<T> *getLast();
     void insertUp(int *elements, int numElements);
     
-//private:
-    DownBuffer *downBufferHead;
-    Level *nextLevel;
-    Level *prevLevel;
+private:
+    //void makeDownBuffers(Buffer *loc);
+    Buffer<T> *freeBuffer();
+    Buffer<T> *downBufferHead;
+    //Level *nextLevel;
+    //Level *prevLevel;
+    Buffer<T> *upBuffer;
+    //Buffer **downBuffers;
     double size;
-    int memSize;
-    Buffer *upBuffer;
-    DownBuffer **downBuffers;
-    void makeDownBuffers(DownBuffer *loc);
-    DownBuffer *freeBuffer();
     int numDown;
 };
 

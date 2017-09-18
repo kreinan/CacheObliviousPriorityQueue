@@ -1,10 +1,10 @@
 #include <iostream>
 #include "Buffer.hpp"
 
-Buffer::Buffer(int elements)
+Buffer::Buffer(int *_start, int elements)
 {
     capacity = elements;
-    start = new (this + 1) int[elements];
+    start = _start;
     numElements = 0;
 }
 
@@ -40,15 +40,9 @@ int Buffer::getNumElements()
 
 void Buffer::insert(int* elements, int nElements)
 {
-    if(capacity - numElements >= nElements)
-    {
-        std::copy(elements, elements + nElements, getLastElement());
-        numElements += nElements;
-        assert(numElements <= capacity);
-    }
-    else{
-        std::cout << "not enough space" << std::endl;
-    }
+    std::copy(elements, elements + nElements, getLastElement());
+    numElements += nElements;
+    assert(numElements <= capacity);
 }
 
 void Buffer::insert(int element)
@@ -70,7 +64,7 @@ void Buffer::empty()
 
 void* Buffer::getEnd()
 {
-    return (void *)(start + capacity);
+    return start + capacity;
 }
 
 IDBuffer::IDBuffer(int elements) : Buffer()
@@ -79,11 +73,11 @@ IDBuffer::IDBuffer(int elements) : Buffer()
     start = new int[elements];
 }
 
-DownBuffer::DownBuffer(int elements) : Buffer()
+DownBuffer::DownBuffer(int *_start, int elements) : Buffer()
 {
     //prev = nullptr;
     capacity = elements;
-    start = new (this + 1) int[elements];
+    start = _start;
     free = true;
     next = nullptr;
     prev = nullptr;
